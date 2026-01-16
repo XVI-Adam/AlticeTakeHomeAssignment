@@ -14,7 +14,7 @@ final class TrendingViewModel: ObservableObject {
     @Published var isLoading: Bool = false
     @Published var errorMessage: String? = nil
 
-    private let service = FetchTrending()
+    private let service = TMDBClient()
 
     func load(window: String) async {
         isLoading = true

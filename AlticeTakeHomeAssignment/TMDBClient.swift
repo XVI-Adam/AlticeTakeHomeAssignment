@@ -1,5 +1,5 @@
 //
-//  FetchTrending.swift
+//  TMDBClient.swift
 //  AlticeTakeHomeAssignment
 //
 //  Created by Adam Martinez on 1/15/26.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct FetchTrending {
+struct TMDBClient {
     let tmdbBaseURL = APIConfig.shared.tmdbBaseURL
     let tmdbAPIKey = APIConfig.shared.tmdbAPIKey
 
@@ -34,4 +34,29 @@ struct FetchTrending {
         
         return decodedResponse.results
     }
+    
+    func fetchMovieDetails(movieId: Int) async throws -> MovieDetails {
+
+        guard let baseURL = URL(string: tmdbBaseURL) else {
+            throw NetworkError.missingConfig
+        }
+
+        guard let detailsURL = URL(string: "\(baseURL)/movie/\(movieId)?api_key=\(tmdbAPIKey)&language=en-US") else {
+            throw NetworkError.missingConfig
+        }
+
+        let (data, response) = try await URLSession.shared.data(from: detailsURL)
+
+        guard let httpResponse = response as? HTTPURLResponse,
+              (200...299).contains(httpResponse.statusCode) else {
+            throw NetworkError.badURLResponse(underlyingError: URLError(.badServerResponse))
+        }
+
+        let decoder = JSONDecoder()
+        decoder.keyDecodingStrategy = .convertFromSnakeCase
+
+        let decoded = try decoder.decode(MovieDetails.self, from: data)
+        return decoded
+    }
+
 }

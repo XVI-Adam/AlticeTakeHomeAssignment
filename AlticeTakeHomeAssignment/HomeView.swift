@@ -1,5 +1,4 @@
 import SwiftUI
-import Combine
 
 struct HomeView: View {
     @StateObject private var viewModel = TrendingViewModel()
@@ -85,19 +84,25 @@ struct MovieRow: View {
 
     var body: some View {
         HStack(spacing: 12) {
-            poster
+            PosterImageView(
+                posterPath: movie.posterPath,
+                width: 70,
+                height: 105,
+                cornerRadius: 10
+            )
+            
             VStack(alignment: .leading, spacing: 4) {
                 Text(movie.title)
                     .font(.headline)
                     .lineLimit(1)
 
-                if let releaseDate = movie.release_date {
+                if let releaseDate = movie.releaseDate {
                     Text("Release: \(releaseDate)")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
 
-                if let rating = movie.vote_average {
+                if let rating = movie.voteAverage {
                     Text(String(format: "Rating: %.1f", rating))
                         .font(.caption)
                         .foregroundStyle(.secondary)
@@ -105,91 +110,10 @@ struct MovieRow: View {
             }
 
             Spacer()
+            FavoriteButton(movie: movie)
         }
         .padding(.vertical, 6)
     }
-
-    private var poster: some View {
-        Group {
-            if let posterPath = movie.poster_path,
-               let url = URL(string: "\(Constants.imageBaseURL)\(posterPath)") {
-
-                AsyncImage(url: url) { phase in
-                    switch phase {
-                    case .empty:
-                        ProgressView()
-                            .frame(width: 70, height: 105)
-
-                    case .success(let image):
-                        image
-                            .resizable()
-                            .scaledToFill()
-                            .frame(width: 70, height: 105)
-                            .clipped()
-                            .cornerRadius(10)
-
-                    case .failure:
-                        Image(systemName: "photo")
-                            .frame(width: 70, height: 105)
-
-                    @unknown default:
-                        EmptyView()
-                    }
-                }
-
-            } else {
-                Image(systemName: "photo")
-                    .frame(width: 70, height: 105)
-            }
-        }
-    }
 }
 
-struct MovieDetailView: View {
-    let movie: Movie
 
-    var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
-
-                if let posterPath = movie.poster_path,
-                   let url = URL(string: "\(Constants.imageBaseURL)\(posterPath)") {
-                    AsyncImage(url: url) { image in
-                        image.resizable().scaledToFit()
-                    } placeholder: {
-                        ProgressView()
-                    }
-                    .cornerRadius(14)
-                    .padding(.horizontal)
-                }
-
-                VStack(alignment: .leading, spacing: 8) {
-                    Text(movie.title)
-                        .font(.title)
-                        .bold()
-
-                    if let overview = movie.overview, !overview.isEmpty {
-                        Text(overview)
-                            .font(.body)
-                            .foregroundStyle(.secondary)
-                    }
-
-                    if let rating = movie.vote_average {
-                        Text(String(format: "⭐️ %.1f", rating))
-                            .font(.headline)
-                    }
-
-                    if let releaseDate = movie.release_date {
-                        Text("Released: \(releaseDate)")
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                    }
-                }
-                .padding(.horizontal)
-            }
-            .padding(.vertical)
-        }
-        .navigationTitle("Details")
-        .navigationBarTitleDisplayMode(.inline)
-    }
-}

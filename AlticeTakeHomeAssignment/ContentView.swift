@@ -14,10 +14,10 @@ struct ContentView: View {
                 HomeView()
             }
             Tab(Constants.favoriteString, systemImage: Constants.favoriteIconString){
-                Text(Constants.favoriteString)
+                FavoriteView()
             }
             Tab(Constants.settingString, systemImage: Constants.settingIconString){
-                Text(Constants.settingString)
+                SettingsView()
             }
         }
     }

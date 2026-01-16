@@ -11,7 +11,7 @@ struct Movie: Codable, Identifiable {
     var id: Int
     var title: String
     var overview: String?
-    var poster_path: String?
-    var vote_average: Double?
-    var release_date: String?
+    var posterPath: String?
+    var voteAverage: Double?
+    var releaseDate: String?
 }
